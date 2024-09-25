@@ -7,6 +7,7 @@ import InputField from "@/components/InputField";
 import { icons, images } from "@/constants";
 import OAuth from "@/components/OAuth";
 import ReactNativeModal from "react-native-modal";
+import { fetchAPI } from "../../lib/fetch";
 
 const SignUp = () => {
 
@@ -53,6 +54,15 @@ const SignUp = () => {
       });
       if (completeSignUp.status === "complete") {
         //TODO: Create a database user!
+
+        await fetchAPI("/(api)/user", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            clerkId: completeSignUp.createdUserId,
+          }),
+        });
         await setActive({ session: completeSignUp.createdSessionId });
         setVerification({
           ...verification,
@@ -68,6 +78,7 @@ const SignUp = () => {
     } catch (err: any) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
+      console.log(err)
       setVerification({
         ...verification,
         error: err.errors[0].longMessage,
